@@ -1,8 +1,21 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    match /feedback_responses/{feedback_response} {
+      function validateFeedbackResponse() {
+        return request.resource.data.keys().hasOnly(['page_ref', 'date', 'is_positive_feedback', 'event_description', 'suggestions', 'email']) &&
+        request.resource.data['page_ref'] is string &&
+        request.resource.data['page_ref'].size() < 100 &&
+        request.resource.data['date'] == request.time.date() &&
+        request.resource.data['is_positive_feedback'] is boolean &&
+        request.resource.data['event_description'] is string &&
+        request.resource.data['event_description'].size() < 5000 &&
+        request.resource.data['suggestions'] is string &&
+        request.resource.data['suggestions'].size() < 5000 &&
+        request.resource.data['email'] is string &&
+        request.resource.data['email'].size() < 255;
+      }
+      allow create: if validateFeedbackResponse();
     }
   }
 }
