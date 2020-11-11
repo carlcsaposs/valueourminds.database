@@ -41,5 +41,15 @@ service cloud.firestore {
       }
       allow create: if validateLinkClick();
     }
+    match /poster_placements/{poster_placement} {
+      function validatePosterPlacement() {
+        return request.resource.data.keys().hasOnly(['qr_id', 'date', 'location']) &&
+        request.resource.data['qr_id'] is string &&
+        request.resource.data['qr_id'].size() == 8 &&
+        request.resource.data['date'] == request.time.date() &&
+        request.resource.data['location'] is latlng;
+      }
+      allow create: if validatePosterPlacement();
+    }
   }
 }
