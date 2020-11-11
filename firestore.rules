@@ -51,5 +51,14 @@ service cloud.firestore {
       }
       allow create: if validatePosterPlacement();
     }
+    match /counters/mindthe5 {
+      function validateMindthe5Increment() {
+        return request.resource.data.keys().hasOnly(['count']) &&
+        request.resource.data['count'] is int &&
+        request.resource.data['count'] == resource.data['count'] + 1;
+      }
+      allow update: if validateMindthe5Increment();
+      allow read: if true;
+    }
   }
 }
