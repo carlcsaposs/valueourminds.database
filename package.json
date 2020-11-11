@@ -1,0 +1,10 @@
+{
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "deploy-firestore": "firebase deploy --only firestore --non-interactive"
+  },
+  "devDependencies": {
+    "firebase-tools": "^8.15.1"
+  }
+}
