@@ -7,7 +7,7 @@ service cloud.firestore {
         request.resource.data['page_ref'] is string &&
         request.resource.data['page_ref'].size() < 100 &&
         request.resource.data['date'] == request.time.date() &&
-        request.resource.data['is_positive_feedback'] is boolean &&
+        request.resource.data['is_positive_feedback'] is bool &&
         request.resource.data['event_description'] is string &&
         request.resource.data['event_description'].size() < 5000 &&
         request.resource.data['suggestions'] is string &&
