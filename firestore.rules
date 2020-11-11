@@ -17,5 +17,29 @@ service cloud.firestore {
       }
       allow create: if validateFeedbackResponse();
     }
+    match /page_loads/{page_load} {
+      function validatePageLoad() {
+        return request.resource.data.keys().hasOnly(['qr_ref', 'date', 'page_path']) &&
+        (request.resource.data['qr_ref'] == null ||
+          (request.resource.data['qr_ref'] is string &&
+          request.resource.data['qr_ref'].size() == 8)
+        ) &&
+        request.resource.data['date'] == request.time.date() &&
+        request.resource.data['page_path'] is string &&
+        request.resource.data['page_path'].size() < 100;
+      }
+      allow create: if validatePageLoad();
+    }
+    match /link_clicks/{link_click} {
+      function validateLinkClick() {
+        return request.resource.data.keys().hasOnly(['href', 'date', 'page_path']) &&
+        request.resource.data['href'] is string &&
+        request.resource.data['href'].size() < 500 &&
+        request.resource.data['date'] == request.time.date() &&
+        request.resource.data['page_path'] is string &&
+        request.resource.data['page_path'].size() < 100;
+      }
+      allow create: if validateLinkClick();
+    }
   }
 }
