@@ -9,11 +9,11 @@ service cloud.firestore {
         request.resource.data['date'] == request.time.date() &&
         request.resource.data['is_positive_feedback'] is bool &&
         request.resource.data['event_description'] is string &&
-        request.resource.data['event_description'].size() < 5000 &&
+        request.resource.data['event_description'].size() <= 3000 &&
         request.resource.data['suggestions'] is string &&
-        request.resource.data['suggestions'].size() < 5000 &&
+        request.resource.data['suggestions'].size() <= 2000 &&
         request.resource.data['email'] is string &&
-        request.resource.data['email'].size() < 255;
+        request.resource.data['email'].size() <= 254;
       }
       allow create: if validateFeedbackResponse();
     }
