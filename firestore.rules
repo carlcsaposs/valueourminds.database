@@ -41,6 +41,21 @@ service cloud.firestore {
       }
       allow create: if validateLinkClick();
     }
+    match /qr_code_events/{qr_code_event} {
+      function validateQrCodeEvent() {
+        return request.resource.data.keys().hasOnly(['qr_id', 'date', 'index', 'type', 'design']) &&
+        request.resource.data['qr_id'] is string &&
+        request.resource.data['qr_id'].size() == 8 &&
+        request.resource.data['date'] == request.time.date() &&
+        request.resource.data['index'] == 0 &&
+        request.resource.data['type'] == 'generate' &&
+        request.resource.data['design'] is int &&
+        request.resource.data['design'] > 0 &&
+        request.resource.data['design'] < 100
+      }
+      allow create: if validateQrCodeEvent();
+      allow read: if resource.data['type'] == 'generate';
+    }
     match /poster_placements_dev/{poster_placement} {
       function validatePosterPlacement() {
         return request.resource.data.keys().hasOnly(['qr_id', 'date', 'location']) &&
