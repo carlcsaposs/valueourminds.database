@@ -42,29 +42,32 @@ service cloud.firestore {
       allow create: if validateLinkClick();
     }
     match /qr_code_events/{qr_code_event} {
-      function validateQrCodeEvent() {
-        return request.resource.data.keys().hasOnly(['qr_id', 'date', 'index', 'type', 'design']) &&
-        request.resource.data['qr_id'] is string &&
-        request.resource.data['qr_id'].size() == 8 &&
-        request.resource.data['date'] == request.time.date() &&
-        request.resource.data['index'] == 0 &&
-        request.resource.data['type'] == 'generate' &&
+      function validateGenerate() {
+        return request.resource.data.keys().hasOnly(['qr_id', 'timestamp', 'type', 'design']) &&
         request.resource.data['design'] is int &&
         request.resource.data['design'] > 0 &&
-        request.resource.data['design'] < 100
+        request.resource.data['design'] < 100;
       }
-      allow create: if validateQrCodeEvent();
-      allow read: if resource.data['type'] == 'generate';
-    }
-    match /poster_placements_dev/{poster_placement} {
-      function validatePosterPlacement() {
-        return request.resource.data.keys().hasOnly(['qr_id', 'date', 'location']) &&
-        request.resource.data['qr_id'] is string &&
-        request.resource.data['qr_id'].size() == 8 &&
-        request.resource.data['date'] == request.time.date() &&
+      function validateActivate() {
+        return request.resource.data.keys().hasOnly(['qr_id', 'timestamp', 'type', 'location']) &&
         request.resource.data['location'] is latlng;
       }
-      allow create: if validatePosterPlacement();
+      function validateQrCodeEvent() {
+        return request.resource.data['qr_id'] is string &&
+        request.resource.data['qr_id'].size() == 8 &&
+        request.resource.data['timestamp'] == request.time &&
+        // Type-specific validation
+        (
+          (request.resource.data['type'] == 'generate' && validateGenerate()) ||
+          (request.resource.data['type'] == 'activate' && validateActivate())
+        );
+      }
+      allow create: if validateQrCodeEvent();
+      function validateRead() {
+        return (resource.data['type'] == 'generate' && request.query.limit <= 9) ||
+        (request.query.limit == 1 && request.query.orderBy['timestamp'] == 'DESC');
+      }
+      allow list: if validateRead();
     }
     match /counters/mindthe5 {
       function validateMindthe5Increment() {
