@@ -73,7 +73,7 @@ service cloud.firestore {
         request.resource.data['count'] == resource.data['count'] + 1;
       }
       allow update: if validateMindthe5Increment();
-      allow read: if true;
+      allow get: if true;
     }
   }
 }
