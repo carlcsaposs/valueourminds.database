@@ -5,6 +5,6 @@
     "deploy-firestore": "firebase deploy --only firestore --non-interactive"
   },
   "devDependencies": {
-    "firebase-tools": "^8.19.0"
+    "firebase-tools": "^9.0.0"
   }
 }
